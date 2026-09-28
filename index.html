@@ -133,6 +133,12 @@ tr:last-child td{border-bottom:none}
 details{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px 20px;margin-bottom:12px}
 summary{cursor:pointer;font-weight:600}
 details ol{margin:10px 0 4px;padding-left:22px;color:var(--muted)}
+.tries{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:12px}
+@media (max-width:820px){.tries{grid-template-columns:1fr}}
+.try{background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.try-h{display:flex;align-items:center;justify-content:space-between;padding:8px 14px;border-bottom:1px solid var(--line);font-size:13px;color:var(--muted)}
+.try pre{margin:0;padding:12px 14px;white-space:pre-wrap;word-break:break-word;font:inherit;font-size:15px;color:var(--text)}
+.copy{font:inherit;font-size:13px;border:1px solid var(--line);background:var(--surface-2);color:var(--text);border-radius:6px;padding:2px 10px;cursor:pointer}
 footer{padding:40px 0 60px;border-top:1px solid var(--line);color:var(--muted);font-size:14px;text-align:center}
 </style>
 </head>
@@ -335,16 +341,31 @@ footer{padding:40px 0 60px;border-top:1px solid var(--line);color:var(--muted);f
         <li>装完会自动弹出四屏引导：快捷键、AI 密钥、要不要留意剪贴板</li>
         <li>选中一段文字，按 <kbd>Ctrl</kbd> <kbd>Alt</kbd> <kbd>Y</kbd> 记下；<kbd>Ctrl</kbd> <kbd>Alt</kbd> <kbd>D</kbd> 打开工作台</li>
       </ol></details>
-    <details><summary>试一试可以记这句</summary>
-      <ol style="list-style:none;padding-left:0">
-        <li>「张工：接口文档我周三前更新完，到时候你验一下」：看看它会不会记成「我在等的」</li>
-        <li>「好的收到」：看看它会不会识别成没有要做的事</li>
-      </ol></details>
+    <h3 style="margin-top:32px">装好后，复制下面的对话试一试</h3>
+    <div class="tries">
+      <div class="try"><div class="try-h"><span>同事交代</span><button type="button" class="copy">复制</button></div><pre>刘佳：Q4 投放方案周四下班前发我一下</pre></div>
+      <div class="try"><div class="try-h"><span>别人答应你</span><button type="button" class="copy">复制</button></div><pre>张工：接口文档我周三前更新完，到时候你验一下</pre></div>
+      <div class="try"><div class="try-h"><span>客户催问</span><button type="button" class="copy">复制</button></div><pre>华东区-陈总：报价单我们看过了，今天下午三点前能确认一下最终折扣吗？</pre></div>
+      <div class="try"><div class="try-h"><span>会议纪要</span><button type="button" class="copy">复制</button></div><pre>周例会纪要
+1. 本周客户访谈纪要周五前整理好发项目群
+2. 下周一评审会前准备 V2 需求清单
+3. 小林负责首页高保真，明天中午给到</pre></div>
+      <div class="try"><div class="try-h"><span>客套话</span><button type="button" class="copy">复制</button></div><pre>好的收到👌</pre></div>
+    </div>
   </div>
 </section>
 
 <footer>
   <div class="wrap">《我的助理叫阿拉》 · 作者 蒋中林 · 当前版本 0.1.0（2026 年 9 月）</div>
 </footer>
+<script>
+document.querySelectorAll('.try .copy').forEach(function (b) {
+  b.addEventListener('click', function () {
+    var t = b.closest('.try').querySelector('pre').innerText;
+    function done(ok) { b.textContent = ok ? '已复制' : '请手动选中复制'; setTimeout(function () { b.textContent = '复制'; }, 1600); }
+    try { navigator.clipboard.writeText(t).then(function () { done(true); }, function () { done(false); }); } catch (e) { done(false); }
+  });
+});
+</script>
 </body>
 </html>
