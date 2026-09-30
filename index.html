@@ -124,6 +124,7 @@ tr:last-child td{border-bottom:none}
 @media (max-width:820px){.dl{grid-template-columns:1fr}}
 .dl .item{display:flex;flex-direction:column;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px 20px}
 .dl .item .btn{margin-top:16px;justify-content:center;width:100%}
+.dl .item .btn + .btn{margin-top:8px}
 .dl .item .btn:hover{filter:brightness(1.08)}
 .dl .os{font-weight:700;font-size:17px}
 .dl .fn{font-size:13px;color:var(--muted);font-family:ui-monospace,Menlo,Consolas,monospace;word-break:break-all}
@@ -314,19 +315,22 @@ footer{padding:40px 0 60px;border-top:1px solid var(--line);color:var(--muted);f
   <div class="wrap">
     <h2>下载体验</h2>
     <p class="sub">约 3 分钟装好。安装包还没有购买平台签名证书，第一次打开会被系统拦一下，按下面的步骤放行即可，放行一次以后就不会再问。</p>
+    <p class="note"><b>国内网络请先看这一句：</b>GitHub 的安装包在国内直连通常下载不了，需要开 VPN。<b>没有 VPN，请用百度网盘下载</b>（提取码 j66g），三个安装包都在里面，文件名与下面一致。</p>
     <div class="dl">
       <div class="item">
         <div class="os">macOS · Apple 芯片</div><div class="fn">Ala-0.1.0-mac-arm64.dmg</div><div class="hint">M1 / M2 / M3 / M4，macOS 12 及以上</div>
-        <a class="btn primary" href="https://github.com/jiangdaren/ala/releases/latest/download/Ala-0.1.0-mac-arm64.dmg">↓ 下载 · 146 MB</a></div>
+        <a class="btn primary" href="https://github.com/jiangdaren/ala/releases/latest/download/Ala-0.1.0-mac-arm64.dmg">↓ GitHub 下载 · 146 MB（需 VPN）</a>
+        <a class="btn ghost" href="https://pan.baidu.com/s/1CeV8UgJTyuZRQTnKoK-Zqg?pwd=j66g" rel="noopener">百度网盘下载（无需 VPN）</a></div>
       <div class="item">
         <div class="os">macOS · Intel</div><div class="fn">Ala-0.1.0-mac-intel.dmg</div><div class="hint">「关于本机」里写着 Intel，macOS 12 及以上</div>
-        <a class="btn primary" href="https://github.com/jiangdaren/ala/releases/latest/download/Ala-0.1.0-mac-intel.dmg">↓ 下载 · 152 MB</a></div>
+        <a class="btn primary" href="https://github.com/jiangdaren/ala/releases/latest/download/Ala-0.1.0-mac-intel.dmg">↓ GitHub 下载 · 152 MB（需 VPN）</a>
+        <a class="btn ghost" href="https://pan.baidu.com/s/1CeV8UgJTyuZRQTnKoK-Zqg?pwd=j66g" rel="noopener">百度网盘下载（无需 VPN）</a></div>
       <div class="item">
         <div class="os">Windows</div><div class="fn">Ala-0.1.0-win-x64.exe</div><div class="hint">Windows 10 / 11，64 位</div>
-        <a class="btn primary" href="https://github.com/jiangdaren/ala/releases/latest/download/Ala-0.1.0-win-x64.exe">↓ 下载 · 124 MB</a></div>
+        <a class="btn primary" href="https://github.com/jiangdaren/ala/releases/latest/download/Ala-0.1.0-win-x64.exe">↓ GitHub 下载 · 124 MB（需 VPN）</a>
+        <a class="btn ghost" href="https://pan.baidu.com/s/1CeV8UgJTyuZRQTnKoK-Zqg?pwd=j66g" rel="noopener">百度网盘下载（无需 VPN）</a></div>
     </div>
 
-    <p class="note" style="background:var(--accent-soft)"><b style="color:var(--accent)">GitHub 下载慢或打不开？</b>三个安装包在国内网盘也有一份：<a href="https://pan.baidu.com/s/1CeV8UgJTyuZRQTnKoK-Zqg?pwd=j66g" rel="noopener">百度网盘下载</a>（提取码 j66g）</p>
     <p class="note"><b>AI 功能需要一个 DeepSeek 密钥。</b>不填也能记录，但不会自动变成待办。在 <a href="https://platform.deepseek.com" rel="noopener">platform.deepseek.com</a> 注册、充值几元，创建一个 API Key，填进首次引导的第 3 屏即可。</p>
 
     <details><summary>macOS：第一次打开被拦住怎么办</summary>

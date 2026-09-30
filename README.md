@@ -8,7 +8,7 @@
 
 ## 下载
 
-到 [Releases](https://github.com/jiangdaren/ala/releases/latest) 下载对应安装包：
+到 [Releases](https://github.com/jiangdaren/ala/releases/latest) 下载对应安装包。国内直连 GitHub 通常下载不了，需要开 VPN；**没有 VPN 请用[百度网盘](https://pan.baidu.com/s/1CeV8UgJTyuZRQTnKoK-Zqg?pwd=j66g)**（提取码 j66g）。
 
 | 系统 | 文件 |
 |---|---|
