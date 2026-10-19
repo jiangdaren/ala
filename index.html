@@ -186,6 +186,7 @@ footer{padding:40px 0 60px;border-top:1px solid var(--line);color:var(--muted);f
 .g-dog.flip{transform:scaleX(-1)}
 .g-dog[class*="s-"]{background-size:calc(var(--n) * var(--w)) var(--h);animation:sheet var(--d) steps(var(--n)) infinite}
 .g-dog.once{animation-iteration-count:var(--it,1)}
+.s-idle{background-image:url(img/anim-idle.png)!important;--n:23;--d:3.83s}   /* 桌面版 46 帧隔一取一 */
 .s-walk{background-image:url(img/anim-walking.png)!important;--n:9;--d:.75s}
 .s-sleep{background-image:url(img/anim-sleeping.png)!important;--n:24;--d:12s}
 .s-think{background-image:url(img/anim-thinking.png)!important;--n:32;--d:6.4s}
@@ -466,13 +467,14 @@ var Ala = (function () {
   var bubT, onceT, sleepT, busy = false;
   // 动作图一开页就在后台全部下好、解码好；**没好的动作先不切**，先静坐、到了再切。
   // 原来切到一张还没下载的图，狗会空白 0.5～几秒（2026-10-19 少爷报「有时候不见」，国内访问 GitHub 更久）
-  var SHEET = { walk: 'walking', notify: 'notify', cel: 'celebrating', think: 'thinking', cap: 'capturing', sleep: 'sleeping' };
+  var SHEET = { idle: 'idle', walk: 'walking', notify: 'notify', cel: 'celebrating', think: 'thinking', cap: 'capturing', sleep: 'sleeping' };
   var ready = {}, want = null;
   function preload() {                                    // 等页面载完再下，免得标签页一直转圈
     Object.keys(SHEET).forEach(function (k) {
       var im = new Image(); im.src = 'img/anim-' + SHEET[k] + '.png';
       var p = im.decode ? im.decode() : new Promise(function (ok, no) { im.onload = ok; im.onerror = no; });
-      p.then(function () { ready[k] = 1; if (want && want.p === k) pose(want.p, want.times); }, function () {});
+      p.then(function () { ready[k] = 1; if (want && want.p === k) pose(want.p, want.times);
+        else if (k === 'idle' && !want && !/ s-/.test(dog.className)) pose(null); }, function () {});
     });
   }
   if (document.readyState === 'complete') preload(); else addEventListener('load', preload);
@@ -480,6 +482,7 @@ var Ala = (function () {
     clearTimeout(onceT);
     want = p && !ready[p] ? { p: p, times: times } : null;
     if (want) p = null;                                   // 图还没到：先静坐（静坐帧随页面一起加载）
+    if (!p && ready.idle) p = 'idle';                      // 坐着也要动：歪头、张望
     var flip = dog.classList.contains('flip');
     dog.className = 'g-dog' + (flip ? ' flip' : '') + (p ? ' s-' + p : '');
     if (p && times && !calm) {
