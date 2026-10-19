@@ -464,8 +464,22 @@ var Ala = (function () {
   var calm = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
   var LEN = { cap: .6, cel: .84, notify: 1 };            // 一次性动作的单次时长（秒），取自素材清单
   var bubT, onceT, sleepT, busy = false;
+  // 动作图一开页就在后台全部下好、解码好；**没好的动作先不切**，先静坐、到了再切。
+  // 原来切到一张还没下载的图，狗会空白 0.5～几秒（2026-10-19 少爷报「有时候不见」，国内访问 GitHub 更久）
+  var SHEET = { walk: 'walking', notify: 'notify', cel: 'celebrating', think: 'thinking', cap: 'capturing', sleep: 'sleeping' };
+  var ready = {}, want = null;
+  function preload() {                                    // 等页面载完再下，免得标签页一直转圈
+    Object.keys(SHEET).forEach(function (k) {
+      var im = new Image(); im.src = 'img/anim-' + SHEET[k] + '.png';
+      var p = im.decode ? im.decode() : new Promise(function (ok, no) { im.onload = ok; im.onerror = no; });
+      p.then(function () { ready[k] = 1; if (want && want.p === k) pose(want.p, want.times); }, function () {});
+    });
+  }
+  if (document.readyState === 'complete') preload(); else addEventListener('load', preload);
   function pose(p, times) {                               // p 为空 = 静坐
     clearTimeout(onceT);
+    want = p && !ready[p] ? { p: p, times: times } : null;
+    if (want) p = null;                                   // 图还没到：先静坐（静坐帧随页面一起加载）
     var flip = dog.classList.contains('flip');
     dog.className = 'g-dog' + (flip ? ' flip' : '') + (p ? ' s-' + p : '');
     if (p && times && !calm) {
