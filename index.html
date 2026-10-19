@@ -140,7 +140,6 @@ details ol{margin:10px 0 4px;padding-left:22px;color:var(--muted)}
 .try pre{margin:0;padding:12px 14px;white-space:pre-wrap;word-break:break-word;font:inherit;font-size:15px;color:var(--text)}
 .copy{font:inherit;font-size:13px;border:1px solid var(--line);background:var(--surface-2);color:var(--text);border-radius:6px;padding:2px 10px;cursor:pointer}
 footer{padding:40px 0 60px;border-top:1px solid var(--line);color:var(--muted);font-size:14px;text-align:center}
-footer button{font:inherit;font-size:13px;color:var(--accent);background:none;border:0;cursor:pointer;padding:0;margin-left:10px}
 
 /* ── 先试一下：群聊 → 阿拉的待办 ── */
 .demo{display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:start}
@@ -181,7 +180,6 @@ footer button{font:inherit;font-size:13px;color:var(--accent);background:none;bo
 
 /* ── 带路的阿拉（素材：app/assets/pet 帧动画，缩到一半） ── */
 #guide{position:fixed;right:16px;bottom:10px;z-index:6;--w:132px;--h:111px;width:var(--w);user-select:none;-webkit-user-select:none}
-#guide[hidden]{display:none}
 @media (max-width:620px){#guide{--w:92px;--h:77px;right:6px;bottom:4px}body{padding-bottom:70px}}
 .g-dog{width:var(--w);height:var(--h);cursor:pointer;background:url(img/dog-idle-frame.png) 0 0/var(--w) var(--h) no-repeat;
   animation:breathe 3.6s ease-in-out infinite;transform-origin:50% 100%}
@@ -200,10 +198,6 @@ footer button{font:inherit;font-size:13px;color:var(--accent);background:none;bo
   background:var(--surface);color:var(--text);border:1px solid var(--line);box-shadow:var(--shadow);border-radius:14px 14px 4px 14px;
   padding:8px 13px;font-size:14px;line-height:1.55;opacity:0;transform:translateY(6px);transition:opacity .25s,transform .25s;pointer-events:none}
 .g-bubble.on{opacity:1;transform:none}
-.g-x{position:absolute;top:-4px;right:-2px;width:22px;height:22px;border-radius:50%;border:1px solid var(--line);background:var(--surface);
-  color:var(--muted);font-size:13px;line-height:1;cursor:pointer;opacity:0;transition:opacity .2s}
-#guide:hover .g-x,.g-x:focus-visible{opacity:1}
-@media (hover:none){.g-x{opacity:.8}}
 @media (prefers-reduced-motion: reduce){.g-dog,.g-dog[class*="s-"]{animation:none!important}.task,.group{animation:none}}
 </style>
 </head>
@@ -448,13 +442,12 @@ footer button{font:inherit;font-size:13px;color:var(--accent);background:none;bo
 </section>
 
 <footer>
-  <div class="wrap">《我的助理叫阿拉》 · 作者 蒋中林 · 当前版本 0.2.3（2026 年 10 月）<button type="button" id="guide-back" hidden>把阿拉叫回来</button></div>
+  <div class="wrap">《我的助理叫阿拉》 · 作者 蒋中林 · 当前版本 0.2.3（2026 年 10 月）</div>
 </footer>
 
 <div id="guide" aria-label="阿拉">
   <div class="g-bubble" id="g-bubble" role="status" aria-live="polite"></div>
   <div class="g-dog" id="g-dog" title="摸摸阿拉"></div>
-  <button type="button" class="g-x" id="g-x" aria-label="让阿拉先回去">×</button>
 </div>
 <script>
 document.querySelectorAll('.try .copy').forEach(function (b) {
@@ -467,8 +460,7 @@ document.querySelectorAll('.try .copy').forEach(function (b) {
 
 /* ── 带路的阿拉 ── */
 var Ala = (function () {
-  var box = document.getElementById('guide'), dog = document.getElementById('g-dog'), bub = document.getElementById('g-bubble');
-  var back = document.getElementById('guide-back');
+  var dog = document.getElementById('g-dog'), bub = document.getElementById('g-bubble');
   var calm = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
   var LEN = { cap: .6, cel: .84, notify: 1 };            // 一次性动作的单次时长（秒），取自素材清单
   var bubT, onceT, sleepT, busy = false;
@@ -486,13 +478,8 @@ var Ala = (function () {
     bubT = setTimeout(function () { bub.classList.remove('on'); }, ms || 4200);
   }
   function nap() { clearTimeout(sleepT); sleepT = setTimeout(function () { if (!busy) { pose('sleep'); say('zZ…（滚一下就醒）', 3500); } }, 30000); }
-  function hide(h) {
-    box.hidden = h; back.hidden = !h;
-    try { localStorage.setItem('ala-guide-off', h ? '1' : ''); } catch (e) {}
-  }
-  document.getElementById('g-x').onclick = function () { hide(true); };
-  back.onclick = function () { hide(false); say('我回来啦。'); };
-  try { if (localStorage.getItem('ala-guide-off') === '1') hide(true); } catch (e) {}
+  // 阿拉一直在，不给关（少爷 2026-10-19：能增强互动性）。旧版点过 × 的访客，那条记录不再读
+  try { localStorage.removeItem('ala-guide-off'); } catch (e) {}
 
   var PETS = ['汪！', '再摸一下？', '记事我在行，握手还在学。', '尾巴摇起来了。'], pi = 0;
   dog.onclick = function () { if (busy) return; pose('cel', 2); say(PETS[pi++ % PETS.length], 2200); nap(); };
@@ -523,7 +510,7 @@ var Ala = (function () {
     say(l[1]);
   }
   addEventListener('scroll', function () {
-    nap(); if (busy || box.hidden) return;
+    nap(); if (busy) return;
     var y = scrollY;
     if (!calm && Math.abs(y - lastY) > 2) {
       dog.classList.toggle('flip', y < lastY);
@@ -536,7 +523,7 @@ var Ala = (function () {
 
   return {
     pose: pose, say: say, nap: nap,
-    busy: function (b) { busy = b; if (b && box.hidden) hide(false); }
+    busy: function (b) { busy = b; }
   };
 })();
 
