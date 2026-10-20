@@ -12,11 +12,11 @@
 
 | 系统 | 文件 |
 |---|---|
-| macOS · Apple 芯片（M1–M4） | `Ala-0.2.3-mac-arm64.dmg` |
-| macOS · Intel | `Ala-0.2.3-mac-intel.dmg` |
-| Windows 10 / 11（64 位） | `Ala-0.2.3-win-x64.exe` |
+| macOS · Apple 芯片（M1–M4） | `Ala-0.2.4-mac-arm64.dmg` |
+| macOS · Intel | `Ala-0.2.4-mac-intel.dmg` |
+| Windows 10 / 11（64 位） | `Ala-0.2.4-win-x64.exe` |
 
-安装包暂未购买平台签名证书，第一次打开会被系统拦一下，放行步骤见[产品主页](https://jiangdaren.github.io/ala/#download)。AI 功能需要自备 DeepSeek API Key。
+安装包暂未购买平台签名证书，第一次打开会被系统拦一下，放行步骤见[产品主页](https://jiangdaren.github.io/ala/#download)。AI 功能已内置体验额度（每台电脑每天 30 次），装好即可试用；正式使用请在设置里换成自己的 DeepSeek API Key。
 
 ## 关于
 
