@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="zh-CN"><head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>入职材料模块说明</title>
+<style>
+  :root{--ink:#111827;--ink2:#374151;--mute:#6b7280;--line:#e5e7eb;--soft:#f9fafb;--accent:#0F766E;
+        --new:#2563EB;--sys:#0F766E;--hr:#7C3AED;--ok:#16A34A;--bad:#EA580C;--doubt:#A16207}
+  *{box-sizing:border-box}
+  body{margin:0;background:#fff;color:var(--ink);font:15px/1.75 "PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif}
+  main{max-width:880px;margin:0 auto;padding:40px 16px 64px}
+  header{border-bottom:2px solid var(--ink);padding-bottom:18px;margin-bottom:28px}
+  h1{font-size:26px;margin:0 0 6px;letter-spacing:.5px}
+  .meta{color:var(--mute);font-size:14px}
+  h2{font-size:19px;margin:40px 0 12px;padding-left:10px;border-left:4px solid var(--accent)}
+  h3{font-size:16px;margin:22px 0 8px}
+  p{margin:8px 0}
+  .lead{background:var(--soft);border:1px solid var(--line);border-radius:8px;padding:14px 18px;color:var(--ink2)}
+  .tw{overflow-x:auto;margin:10px 0}
+  table{border-collapse:collapse;width:100%;font-size:14px}
+  .wide table{min-width:540px}
+  th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+  th{background:var(--soft);font-weight:600;white-space:nowrap}
+  .tag{display:inline-block;font-size:12px;line-height:20px;padding:0 8px;border-radius:10px;border:1px solid;white-space:nowrap}
+  .t-new{color:var(--new);background:#EFF6FF}.t-sys{color:var(--sys);background:#F0FDFA}.t-hr{color:var(--hr);background:#F5F3FF}
+  .t-ok{color:var(--ok);background:#F0FDF4}.t-bad{color:var(--bad);background:#FFF7ED}.t-doubt{color:var(--doubt);background:#FEFCE8}
+  .fig{border:1px solid var(--line);border-radius:10px;padding:12px;margin:12px 0;overflow-x:auto}
+  .fig svg{width:100%;min-width:640px;height:auto}
+  .hint{display:none;color:var(--mute);font-size:13px}
+  @media (max-width:680px){.hint{display:block}}
+  ol,ul{padding-left:22px;margin:6px 0}
+  li{margin:4px 0}
+  .kpi{display:flex;gap:14px;flex-wrap:wrap;margin:12px 0}
+  .kpi div{flex:1 1 220px;border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+  .kpi b{display:block;font-size:24px;color:var(--accent)}
+  .kpi span{color:var(--mute);font-size:13px}
+  .todo{background:#FEF08A;padding:0 3px;border-radius:3px}
+  footer{margin-top:48px;color:var(--mute);font-size:13px;border-top:1px solid var(--line);padding-top:12px}
+</style>
+</head><body><main>
+
+<header>
+  <h1>AI 入职智能体 · 材料上传与判定模块</h1>
+  <div class="meta">蒋中林 ｜ 产品负责人 ｜ i人事 · 2025.9–2025.12</div>
+</header>
+
+<p class="lead">新员工入职时要交身份证、银行卡、学历证、离职证明等材料。这个模块负责：新人拍照上传 → 系统识别 → 自动分流 → HR 确认。和数据采集里的「上传 → 质检 → 复检 → 交付」是同一个模式。</p>
+
+<h2>一、角色分工与个人负责范围</h2>
+<p>我是这个项目的产品负责人，从 0 到 1 负责：</p>
+<div class="tw"><table>
+  <tr><th>阶段</th><th>我做了什么</th></tr>
+  <tr><td>需求调研</td><td>跟客户 HR 梳理入职流程，拆出 HR 的时间花在哪，定了「HR 处理时长」和「材料一次交对率」两个目标</td></tr>
+  <tr><td>方案设计</td><td>定哪些环节交给系统、哪些交给 AI、哪些必须留给 HR；材料模块的识别通道、判定规则、三档分流、退回意见由我设计</td></tr>
+  <tr><td>技术选型</td><td>标准证照用百度 OCR，非标材料用视觉大模型，千问、豆包主备；流程编排放在 i人事 后端，Coze 只做单个 AI 节点</td></tr>
+  <tr><td>交付验收</td><td>写 PRD 和验收标准，跟进研发联调，带试点客户上线，跟踪交对率</td></tr>
+</table></div>
+<p>协作分工：研发团队负责编排引擎和接口实现；识别能力用百度和大模型的现成接口，没有自研模型。</p>
+
+<h2>二、状态流转</h2>
+<p class="hint">图可左右滑动查看</p><div class="fig"><style>.fig svg{font-family:"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif}.ft{font-size:17px;font-weight:600;fill:#1f2937}.fs{font-size:13.5px;fill:#4b5563}.fl{font-size:13px;fill:#6b7280}.fh{font-size:16px;font-weight:700}</style><svg viewBox="0 0 960 1010" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#6b7280"/></marker>
+  </defs>
+
+  <!-- 标题与图例 -->
+  <text x="40" y="46" style="font-size:22px;font-weight:700;fill:#111827">入职材料：上传 → 识别 → 分流 → 确认</text>
+  <g transform="translate(640,32)">
+    <rect width="14" height="14" rx="3" fill="#EFF6FF" stroke="#2563EB"/><text x="20" y="12" class="fs">新人</text>
+    <rect x="70" width="14" height="14" rx="3" fill="#F0FDFA" stroke="#0F766E"/><text x="90" y="12" class="fs">系统 / AI</text>
+    <rect x="172" width="14" height="14" rx="3" fill="#F5F3FF" stroke="#7C3AED"/><text x="192" y="12" class="fs">HR</text>
+  </g>
+
+  <!-- 连线 -->
+  <g stroke="#6b7280" stroke-width="1.6" fill="none">
+    <path d="M480,146 V184" marker-end="url(#a)"/>
+    <path d="M480,270 V308" marker-end="url(#a)"/>
+    <path d="M480,366 V396 M170,396 H790 M170,396 V424 M790,396 V424" />
+    <path d="M480,396 V424" marker-end="url(#a)"/>
+    <path d="M170,396 V424" marker-end="url(#a)"/>
+    <path d="M790,396 V424" marker-end="url(#a)"/>
+    <path d="M170,558 V596" marker-end="url(#a)"/>
+    <path d="M790,558 V596" marker-end="url(#a)"/>
+    <path d="M480,558 V718" marker-end="url(#a)"/>
+    <path d="M790,670 V750 H632" marker-end="url(#a)"/>
+    <path d="M330,750 H170 V672" marker-end="url(#a)" stroke-dasharray="6 4"/>
+    <path d="M40,634 H16 V118 H338" marker-end="url(#a)" stroke-dasharray="6 4"/>
+    <path d="M480,780 V828" marker-end="url(#a)"/>
+  </g>
+  <text x="34" y="460" class="fl" transform="rotate(-90 34 460)">重拍 / 补交后重新上传</text>
+  <text x="196" y="742" class="fl">不通过</text>
+  <text x="490" y="810" class="fl">通过</text>
+
+  <!-- 1 上传 -->
+  <rect x="340" y="90" width="280" height="56" rx="10" fill="#EFF6FF" stroke="#2563EB" stroke-width="1.5"/>
+  <text x="480" y="124" text-anchor="middle" class="ft">新人拍照上传材料</text>
+
+  <!-- 2 解析 -->
+  <rect x="250" y="186" width="460" height="84" rx="10" fill="#F0FDFA" stroke="#0F766E" stroke-width="1.5"/>
+  <text x="480" y="214" text-anchor="middle" class="ft">解析中：识别字段</text>
+  <text x="480" y="238" text-anchor="middle" class="fs">身份证、银行卡等标准证照 → OCR</text>
+  <text x="480" y="258" text-anchor="middle" class="fs">学历证、离职证明等非标材料 → 视觉大模型</text>
+
+  <!-- 3 检查 -->
+  <rect x="330" y="310" width="300" height="56" rx="10" fill="#F0FDFA" stroke="#0F766E" stroke-width="1.5"/>
+  <text x="480" y="344" text-anchor="middle" class="ft">逐项检查，按信号分三档</text>
+
+  <!-- 4L 不可用 -->
+  <rect x="40" y="426" width="260" height="132" rx="10" fill="#fff" stroke="#EA580C" stroke-width="1.5"/>
+  <rect x="40" y="426" width="260" height="34" rx="10" fill="#FFF7ED"/><rect x="40" y="446" width="260" height="14" fill="#FFF7ED"/>
+  <text x="170" y="449" text-anchor="middle" class="fh" fill="#EA580C">不可用 · 图片问题</text>
+  <text x="170" y="486" text-anchor="middle" class="fs">模糊、反光、缺角、遮挡</text>
+  <text x="170" y="512" text-anchor="middle" class="fs">新人重拍就能解决</text>
+
+  <!-- 4M 通过 -->
+  <rect x="350" y="426" width="260" height="132" rx="10" fill="#fff" stroke="#16A34A" stroke-width="1.5"/>
+  <rect x="350" y="426" width="260" height="34" rx="10" fill="#F0FDF4"/><rect x="350" y="446" width="260" height="14" fill="#F0FDF4"/>
+  <text x="480" y="449" text-anchor="middle" class="fh" fill="#16A34A">通过</text>
+  <text x="480" y="486" text-anchor="middle" class="fs">所有检查项都没有问题</text>
+
+  <!-- 4R 存疑 -->
+  <rect x="660" y="426" width="260" height="132" rx="10" fill="#fff" stroke="#CA8A04" stroke-width="1.5"/>
+  <rect x="660" y="426" width="260" height="34" rx="10" fill="#FEFCE8"/><rect x="660" y="446" width="260" height="14" fill="#FEFCE8"/>
+  <text x="790" y="449" text-anchor="middle" class="fh" fill="#A16207">存疑 · 内容疑点</text>
+  <text x="790" y="484" text-anchor="middle" class="fs">复印件或翻拍</text>
+  <text x="790" y="504" text-anchor="middle" class="fs">身份证号与生日对不上</text>
+  <text x="790" y="524" text-anchor="middle" class="fs">跨材料姓名对不上</text>
+  <text x="790" y="544" text-anchor="middle" class="fs">两路识别的号码不一致</text>
+
+  <!-- 5L 退回 -->
+  <rect x="40" y="598" width="260" height="72" rx="10" fill="#EFF6FF" stroke="#2563EB" stroke-width="1.5"/>
+  <text x="170" y="628" text-anchor="middle" class="ft">退回新人</text>
+  <text x="170" y="652" text-anchor="middle" class="fs">当场说明哪里不行、怎么重拍</text>
+
+  <!-- 5R 复核 -->
+  <rect x="660" y="598" width="260" height="72" rx="10" fill="#F5F3FF" stroke="#7C3AED" stroke-width="1.5"/>
+  <text x="790" y="628" text-anchor="middle" class="ft">HR 复核队列</text>
+  <text x="790" y="652" text-anchor="middle" class="fs">重拍解决不了，不打扰新人</text>
+
+  <!-- 6 合规确认 -->
+  <rect x="330" y="720" width="300" height="60" rx="10" fill="#F5F3FF" stroke="#7C3AED" stroke-width="1.5"/>
+  <text x="480" y="756" text-anchor="middle" class="ft">HR 合规确认</text>
+
+  <!-- 7 归档 -->
+  <rect x="330" y="830" width="300" height="60" rx="10" fill="#F0FDFA" stroke="#0F766E" stroke-width="1.5"/>
+  <text x="480" y="866" text-anchor="middle" class="ft">材料归档，流程往下推进</text>
+
+  <!-- 底注 -->
+  <rect x="40" y="926" width="880" height="54" rx="8" fill="#F9FAFB" stroke="#E5E7EB"/>
+  <text x="60" y="958" class="fs" style="font-size:14px">分流看「重拍能不能解决」：能，退回新人；不能，转 HR。AI 只负责识别和分档，合规确认只能由 HR 做。</text>
+</svg>
+</div>
+
+<h3>材料状态</h3>
+<div class="tw wide"><table>
+  <tr><th>状态</th><th>什么时候进入</th><th>谁处理</th><th>下一步</th></tr>
+  <tr><td>待上传</td><td>入职单创建，按员工类型和岗位生成材料清单</td><td><span class="tag t-new">新人</span></td><td>拍照或从相册上传</td></tr>
+  <tr><td>解析中</td><td>上传后，约 3–8 秒</td><td><span class="tag t-sys">系统 / AI</span></td><td>识别字段，逐项检查后分三档</td></tr>
+  <tr><td>需重传</td><td>判定为「不可用」，或 HR 合规确认不通过</td><td><span class="tag t-new">新人</span></td><td>按卡片上的提示重拍，重新进入解析</td></tr>
+  <tr><td>待复核</td><td>判定为「存疑」</td><td><span class="tag t-hr">HR</span></td><td>HR 核对后进入合规确认</td></tr>
+  <tr><td>待合规确认</td><td>判定为「通过」，或复核完成</td><td><span class="tag t-hr">HR</span></td><td>通过则归档；不通过则退回新人</td></tr>
+  <tr><td>已确认</td><td>HR 合规确认通过</td><td><span class="tag t-sys">系统</span></td><td>材料归档，入职流程往下推进</td></tr>
+</table></div>
+
+<h2>三、判定规则：怎么分三档</h2>
+<p>不按置信度分数切。百度证照接口不返回字段级置信度，大模型自己报的分数也不可信，所以改成<b>逐项检查</b>，看触发了哪类信号。分档的原则是：<b>新人重拍能不能解决</b>。</p>
+<div class="tw wide"><table>
+  <tr><th>结果</th><th>触发信号</th><th>处置</th></tr>
+  <tr><td><span class="tag t-bad">不可用</span></td><td>图片模糊、过曝过暗、缺角、遮挡、正反面传反</td><td>图片问题，重拍能解决 → <b>退回新人</b>，当场说明哪里不行、怎么重拍</td></tr>
+  <tr><td><span class="tag t-doubt">存疑</span></td><td>复印件或翻拍；身份证号与性别、生日对不上；银行卡号校验不过；两路识别的号码不一致；跨材料姓名对不上；非标材料必填字段缺失</td><td>图片没问题、内容有疑点，重拍解决不了 → <b>转 HR 复核</b>，不打扰新人</td></tr>
+  <tr><td><span class="tag t-ok">通过</span></td><td>所有检查项都没有问题</td><td>进入 HR 合规确认</td></tr>
+</table></div>
+<p>合规确认只能由 HR 做。这一步之后会建立劳动关系、开始算薪资社保，错了不可逆，AI 不替代。</p>
+
+<h2>四、异常处理</h2>
+<div class="tw wide"><table>
+  <tr><th>异常</th><th>怎么处理</th><th>为什么</th></tr>
+  <tr><td>身份证号、银行卡号识别错一位</td><td>OCR 和视觉大模型各抽一次，两边不一致转 HR</td><td>错一位就是薪资发错、社保建错档，新人也不会逐位核对</td></tr>
+  <tr><td>生僻字、繁简字、异体字导致姓名对不上</td><td>不退回新人，转 HR 复核</td><td>新人重拍多少次都解决不了</td></tr>
+  <tr><td>退回意见说不清楚</td><td>退回意见必须写清「哪里不行 + 怎么拍」，不输出错误码、字段名</td><td>说不清的话，新人会反复传错，退回反而变多</td></tr>
+  <tr><td>大模型说「看不清」</td><td>只作参考，不据此退回</td><td>模型的自我判断不可靠，以检查项为准</td></tr>
+  <tr><td>客户自定义的材料（如保密协议）</td><td>只支持上传 + 人工核验，不做 AI 抽取</td><td>没有配置好字段和校验规则的材料，AI 抽了也没法判</td></tr>
+  <tr><td>AI 节点不可用</td><td>降级为人工处理，流程照样能跑完</td><td>AI 只是执行环节，不驱动流程</td></tr>
+</table></div>
+
+<h2>五、权限</h2>
+<p>材料里有身份证、银行卡这类敏感信息，权限按「谁要用、用到哪一步」来分，<b>功能权限和数据权限分开控</b>。</p>
+<div class="tw wide"><table>
+  <tr><th>角色</th><th>能做什么</th><th>能看到什么数据</th></tr>
+  <tr><td><span class="tag t-hr">HR 管理员</span></td><td>全部功能</td><td>本企业全部入职单</td></tr>
+  <tr><td><span class="tag t-hr">HR 专员</span></td><td>创建入职单、复核材料、合规确认、处理转人工</td><td>只看自己负责的入职单</td></tr>
+  <tr><td>用人部门主管</td><td>查看进度、完成协同任务</td><td>本部门在途的入职，<b>看不到材料原件和薪资</b></td></tr>
+  <tr><td>IT / 行政</td><td>完成分给自己的任务（如开账号）</td><td>只看任务本身，<b>看不到任何个人材料</b></td></tr>
+  <tr><td><span class="tag t-new">新员工</span></td><td>上传材料、查看进度、提问</td><td>只看本人</td></tr>
+</table></div>
+<p>材料原件只有 HR 能看，其他角色只能看到「已完成」。IT 不需要懂入职流程，只需要看到「给张三开账号，明天到期」。</p>
+
+<h2>六、上线与验收结果</h2>
+<p>一期先在 2 家入职量大的老客户试点。验收指标是<b>材料一次交对率</b>：材料第一次提交，就通过 HR 合规确认的比例。上线后每份材料的提交和退回在系统里都有记录。</p>
+<div class="kpi">
+  <div><span>上线前（跟客户 HR 了解）</span><b>约 60%</b><span>十个新人里大概四个要退回补交</span></div>
+  <div><span>试点期</span><b>约 90%</b><span>目标 80%</span></div>
+</div>
+
+<footer>本页为脱敏整理，不含客户信息。</footer>
+</main></body></html>
