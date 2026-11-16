@@ -134,7 +134,40 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .swim-legend i.off{border-style:dashed;border-color:var(--muted);background:var(--bg)}
 .swim-legend i.sys{border-color:var(--accent);background:var(--accent-soft)}
 .swim-legend i.gate{border-color:var(--gC);border-width:2px}
-/* 角色用例 */
+/* 角色用例矩阵 */
+.ucm-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:8px;background:var(--paper)}
+.ucm{display:grid;grid-template-columns:150px repeat(4,minmax(150px,1fr));min-width:780px}
+.ucm>div{padding:10px 12px;border-bottom:1px solid var(--line);border-left:1px solid var(--line);display:flex;flex-direction:column;gap:6px;align-items:flex-start}
+.ucm>div.c0{border-left:none}
+.ucm .hd{background:var(--bg);font-size:12.5px;color:var(--muted);font-weight:500;justify-content:center}
+.ucm .hd b{color:var(--ink);font-size:13.5px}
+.ucm .rl{justify-content:center;gap:2px}
+.ucm .rl b{font-size:14.5px}
+.ucm .rl span{font-size:12px;color:var(--muted);line-height:1.4}
+.ucm .last{border-bottom:none}
+.ucm .empty{color:var(--line);font-size:13px}
+.uc-chip{font:inherit;font-size:13.5px;line-height:1.4;text-align:left;cursor:pointer;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-left:3px solid var(--line);border-radius:6px;padding:6px 9px;width:100%}
+.uc-chip .id{font-family:var(--f-mono);font-size:11px;color:var(--muted);display:block}
+.uc-chip.gA{border-left-color:var(--gA)} .uc-chip.gC{border-left-color:var(--gC)} .uc-chip.gD{border-left-color:var(--gD)}
+.uc-chip:hover{border-color:var(--accent)}
+.uc-chip[aria-pressed="true"]{background:var(--accent-soft);border-color:var(--accent);border-left-width:3px}
+.uc-chip:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.ucm .note{font-size:12.5px;color:var(--muted)}
+.ucd{background:var(--paper);border:1px solid var(--accent);border-radius:8px;padding:20px 22px;display:grid;gap:16px}
+.ucd .t{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 12px}
+.ucd .t h3{font-family:var(--f-display);font-size:20px}
+.ucd .t .id{font-family:var(--f-mono);color:var(--accent);font-size:14px}
+.ucd .t .who{font-size:13px;color:var(--muted)}
+.ucd .kv{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px 24px}
+.ucd .kv div{display:grid;gap:2px}
+.ucd .kv small,.ucd .lab{font-size:12px;color:var(--muted);letter-spacing:.04em}
+.steps{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:4px 0 0;padding:0;list-style:none;counter-reset:s}
+.steps li{counter-increment:s;display:flex;align-items:center;gap:8px;font-size:14px}
+.steps li span{background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:5px 10px}
+.steps li span::before{content:counter(s) " ";font-family:var(--f-mono);color:var(--accent);font-size:12px}
+.steps li:not(:last-child)::after{content:"→";color:var(--muted)}
+.ucd a{color:var(--accent)}
+/* 角色用例（旧卡片，保留样式无害） */
 .roles{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:14px}
 .role{background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:16px;display:grid;gap:10px;align-content:start}
 .role h3{display:flex;justify-content:space-between;gap:8px;align-items:baseline}
@@ -255,9 +288,10 @@ footer{border-top:1px solid var(--line);padding-top:20px;font-size:13px;color:va
 </section>
 
 <section data-page="roles">
-  <div class="sec-head"><span class="sec-no">角色</span><h2>各角色用例</h2><p>只收「一个角色坐下来一次能办完的一件事」，按钮级动作并进路径里。系统里看不到权限配置，角色是从组织架构、字段和 405 无权限页推出来的。</p></div>
+  <div class="sec-head"><span class="sec-no">角色</span><h2>各角色用例</h2><p>每行一个角色，每列一个阶段。点任意用例，下方展开它的路径、异常和对应的流程步骤。角色是从组织架构、字段和 405 无权限页推出来的。</p></div>
   <div class="body">
-    <div class="roles" id="rolecards"></div>
+    <div class="ucm-wrap"><div class="ucm" id="ucm"></div></div>
+    <div class="ucd" id="ucd" aria-live="polite"></div>
     <p class="muted">你参与过调研，各角色实际是谁在做哪件事，你一句话就能把这里的 C 级改成 A 级。</p>
   </div>
 </section>
@@ -573,38 +607,48 @@ flowchart TB
   if(document.fonts&&document.fonts.ready) document.fonts.ready.then(draw);
   if('ResizeObserver' in window) new ResizeObserver(draw).observe(g); else window.addEventListener('resize',draw);
 
-  const roles=[
-    ["业务员","销售部；部分人挂在董事会","C 中",[
-      ["UC01","把新客户登记在自己名下","报备客户 → 董事会或签审批；审批后再改要重新审批；可共享给同事","A"],
-      ["UC02","算清一单生意赚不赚钱再报价","按成本项 × 场次填单价，用倒算器算采购服务费，手动调整凑整后提交；被拒就改；可复制旧报价单","A"],
-      ["UC04","把签好的合同交给公司","录入合同（已签约）→ 送审；改金额时原值留痕","C"],
-      ["UC11","给客户开票","发起开票申请，关联合同；可作废","C"]]],
-    ["管理层","董事会","C 高",[
-      ["UC03","守住利润底线","看报价单的成本明细、净利、执行营收比率，会签通过或拒绝","A"],
-      ["—","把关客户和合同","客户或签审批、合同审批；能看全部模块，但不能立项、不能登记到款","A"]]],
-    ["项目经理","项目部 · 项目一 / 二组","C 中",[
-      ["UC05","把合同拆成每场会的活","立项（项目名含场数）→ 每场派设计、执行、核销三类任务","C"],
-      ["UC09","算清专家劳务和会务费用","会后做劳务结算 → 会务结算，挂在项目和合同上","C"]]],
-    ["设计部","项目部 · 设计部","C 中",[
-      ["UC06","按时交付一场会的物料","按设计任务做海报和串场 PPT；产出在不在系统里，没看到","C"]]],
-    ["执行部","项目部 · 执行部","C 中",[
-      ["UC07","把一场直播办成","按执行任务的会议时间开播，决定是否推流","C"]]],
-    ["核销部","项目部 · 核销一 / 二 / 三组","C 中",[
-      ["UC08","把核销材料交齐","会后整理多位专家的核销资料；核销任务页没打开过","C"]]],
-    ["财务","财务部 · 会计 / 出纳","C 中",[
-      ["UC10","把到账的钱认到对应合同上","导入银行流水 → 单合同认款 → 台账回款更新；一笔拆给多份合同是否支持，没看到","C"],
-      ["UC09","参与结算","劳务、会务结算的审核","C"]]],
-    ["全员","任意员工","A",[
-      ["UC12","为项目借支和报销","借支（已打款后冲抵）或报销，都可以关联合同","A"]]],
-    ["系统管理员","超级员工","C 高",[
-      ["UC13","统一维护学会主数据","新增、编辑、禁用学协会（基金会）；业务员不能随手录","A"]]],
-    ["合规部","合规部 · 合规人员","—",[
-      ["—","系统里没找到任何对应功能","可能在线下完成，也可能是本期没纳入。你调研过，这一格你最清楚","D"]],"none"]
+  const RW=[["sales","业务员","销售部（部分挂董事会）· C 中"],["mgmt","管理层","董事会 · C 高"],["pm","项目经理","项目部 · 项目一 / 二组 · C 中"],["design","设计部","项目部 · C 中"],["exec","执行部","项目部 · C 中"],["verify","核销部","项目部 · 核销一 / 二 / 三组 · C 中"],["fin","财务","财务部 · 会计 / 出纳 · C 中"],["all","全员","任意员工"],["admin","系统管理员","超级员工 · C 高"],["comp","合规部","合规人员"]];
+  const PH=[["P01","商机到合同"],["P02","合同到交付"],["P03","交付到回款"],["GEN","通用"]];
+  const UC=[
+    ["UC01","sales","P01","把新客户登记在自己名下","A","—",["报备客户（药企 × 产品线）","董事会或签审批"],"审批后再改要重新审批；可共享给同事","客户审批通过、归属本人","2–3"],
+    ["UC02","sales","P01","算清一单生意赚不赚钱再报价","A","已有客户",["按成本项 × 场次填单价","倒算器算采购服务费","手动调整凑整","提交会签"],"会签被拒 → 改完重提；可复制旧报价单改着用","报价单审核中","4"],
+    ["UC04","sales","P01","把签好的合同交给公司","C","报价通过、线下已签约",["录入合同（状态即已签约）","送审"],"改金额时，原合同金额 / 成本 / 毛利留痕","合同审核通过，配同号台账","7、9"],
+    ["UC11","sales","P03","给客户开票","C","合同已建立",["发起开票申请","关联合同"],"可作废","已开具","17"],
+    ["UC03","mgmt","P01","守住利润底线","A","报价单审核中",["看成本明细、净利、执行营收比率","会签通过或拒绝"],"拒绝 → 退回业务员修改","审核通过 / 不通过","5"],
+    ["UC14","mgmt","P01","把关客户和合同","A","客户或合同已提交",["客户或签审批","合同审批"],"能看全部模块，但不能立项、不能登记到款（两次 405）","客户 / 合同审批通过","3、9"],
+    ["UC05","pm","P02","把合同拆成每场会的活","C","合同审核通过（推断）",["立项（项目名含场数）","每场派设计任务","派执行任务","派核销任务"],"未观察到","项目进行中，N 场 × 3 类任务","10–11"],
+    ["UC09","pm","P03","算清专家劳务和会务费用","C","会议已开",["劳务结算","会务结算（劳务税前 + 其它费用）"],"未观察到","结算单进入审核","15–16"],
+    ["UC06","design","P02","按时交付一场会的物料","C","收到设计任务",["做海报","做串场 PPT"],"未观察到","产出是否上传到系统，未观察到","12"],
+    ["UC07","exec","P02","把一场直播办成","C","收到执行任务",["按会议时间开播","决定是否推流"],"未观察到","未观察到","13"],
+    ["UC08","verify","P02","把核销材料交齐","C","会议已开（推断）",["整理多位专家的核销资料"],"核销任务页没打开过","未观察到","14"],
+    ["UC10","fin","P03","把到账的钱认到对应合同上","C","银行已到账",["导入银行流水","生成到款（待认款）","单合同认款","台账回款更新"],"一笔钱拆给多份合同是否支持：没看到","台账已回款金额增加（推断）","19–21"],
+    ["UC15","fin","P03","审核劳务和会务结算","C","结算单已提交",["审核劳务结算","审核会务结算"],"未观察到","结算通过","15–16"],
+    ["UC12","all","GEN","为项目借支和报销","A","—",["发起借支或报销","关联合同","审批后打款"],"借支已打款后冲抵","已打款",""],
+    ["UC13","admin","GEN","统一维护学会主数据","A","—",["新增学协会（基金会）","编辑或禁用"],"业务员不能随手录入","正常 / 禁用",""]
   ];
-  const rc=document.getElementById('rolecards');
-  roles.forEach(r=>{const c=document.createElement('div');c.className='role'+(r[4]?' '+r[4]:'');
-    c.innerHTML='<h3>'+r[0]+'<small>'+r[1]+' · 角色推断 '+r[2]+'</small></h3>'+r[3].map(u=>'<div class="uc"><div class="nm"><span class="mono">'+u[0]+'</span>'+u[1]+' <span class="g g'+u[3]+'">'+u[3]+'</span></div><div class="path">'+u[2]+'</div></div>').join('');
-    rc.appendChild(c);});
+  const ucm=document.getElementById('ucm'), ucd=document.getElementById('ucd');
+  const chips={};
+  const cell=(html,cls)=>{const d=document.createElement('div');d.className=cls||'';d.innerHTML=html||'';ucm.appendChild(d);return d;};
+  cell('<b>角色</b>','hd c0'); PH.forEach(p=>cell('<b>'+p[1]+'</b>'+(p[0]==='GEN'?'':p[0]),'hd'));
+  RW.forEach((r,ri)=>{const last=ri===RW.length-1?' last':'';
+    cell('<b>'+r[1]+'</b><span>'+r[2]+'</span>','rl c0'+last);
+    PH.forEach(p=>{const d=cell('',last.trim());
+      const list=UC.filter(u=>u[1]===r[0]&&u[2]===p[0]);
+      if(r[0]==='comp'&&p[0]==='P01'){d.innerHTML='<span class="note">系统里没找到任何对应功能。可能线下完成，也可能本期没纳入 <span class="g gD">D</span></span>';return;}
+      if(!list.length){d.innerHTML='<span class="empty">—</span>';return;}
+      list.forEach(u=>{const b=document.createElement('button');b.type='button';b.className='uc-chip g'+u[4];b.setAttribute('aria-pressed','false');
+        b.innerHTML='<span class="id">'+u[0]+' · '+u[4]+'</span>'+u[3];b.addEventListener('click',()=>{pick(u[0]);ucd.scrollIntoView({block:'nearest',behavior:(matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth')});});d.appendChild(b);chips[u[0]]=b;});
+    });
+  });
+  function pick(id){const u=UC.find(x=>x[0]===id); if(!u) return;
+    Object.entries(chips).forEach(([k,b])=>b.setAttribute('aria-pressed',k===id?'true':'false'));
+    const role=RW.find(r=>r[0]===u[1]), ph=PH.find(p=>p[0]===u[2]);
+    ucd.innerHTML='<div class="t"><span class="id">'+u[0]+'</span><h3>'+u[3]+'</h3><span class="g g'+u[4]+'">'+u[4]+'</span><span class="who">主角色：'+role[1]+' · 阶段：'+ph[1]+'</span></div>'
+      +'<div><div class="lab">主路径</div><ol class="steps">'+u[6].map(x=>'<li><span>'+x+'</span></li>').join('')+'</ol></div>'
+      +'<div class="kv"><div><small>前置条件</small>'+u[5]+'</div><div><small>扩展 / 异常</small>'+u[7]+'</div><div><small>结束时的结果</small>'+u[8]+'</div>'
+      +'<div><small>对应总业务流程</small>'+(u[9]?'<a href="#panorama">第 '+u[9]+' 步</a>':'不在主流程上（横切）')+'</div></div>';
+  }
+  pick('UC02');
 })();
 (function(){
   const order=[["brief","项目拆解"],["panorama","总业务流程"],["roles","角色用例"],["flows","分段流程"],["analysis","业务分析"],["verify","待验证"]];
