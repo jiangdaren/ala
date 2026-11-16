@@ -108,11 +108,14 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .brief ol{margin:0;padding-left:1.3em;display:grid;gap:10px}
 .brief .todo{color:var(--gC);background:var(--gC-bg);border-radius:4px;padding:0 5px;font-size:.92em}
 /* 全景泳道 */
-.swim-scroll{overflow-x:auto;border:1px solid var(--line);border-radius:8px;background:var(--paper)}
-.swim{position:relative;display:grid;grid-template-columns:40px repeat(7,minmax(100px,1fr));row-gap:22px;column-gap:8px;min-width:830px;padding:0 10px 22px 0}
-.lane-bg{grid-row:1/-1;margin:0 -5px;border-radius:6px}
+.swim-scroll{overflow-x:auto;border:1px solid var(--line);border-top:none;border-radius:0 0 8px 8px;background:var(--paper)}
+.swim{position:relative;display:grid;grid-template-columns:40px repeat(7,minmax(100px,1fr));row-gap:22px;column-gap:8px;min-width:830px;padding:18px 10px 22px 0}
+.lane-bg{grid-row:1/-1;margin:-18px -5px 0;border-radius:0 0 6px 6px}
 .lane-bg.alt{background:var(--bg)}
-.lane-h{grid-row:1;position:sticky;top:0;z-index:2;padding:12px 4px 10px;text-align:center;font-size:13px;font-weight:700;border-bottom:1px solid var(--line);background:var(--paper)}
+.swim-head{position:sticky;top:calc(env(safe-area-inset-top,0px) + var(--tabs-h,48px));z-index:4;overflow:hidden;background:var(--paper);border:1px solid var(--line);border-radius:8px 8px 0 0;box-shadow:0 6px 10px -8px rgba(0,0,0,.35)}
+.swim-head-in{display:grid;grid-template-columns:40px repeat(7,minmax(100px,1fr));column-gap:8px;min-width:830px;padding:0 10px 0 0;will-change:transform}
+.lane-h{padding:12px 4px 10px;text-align:center;font-size:13px;font-weight:700;margin:0 -5px}
+.lane-h.alt{background:var(--bg)}
 .lane-h small{display:block;font-weight:400;font-size:11.5px;color:var(--muted)}
 .phase{grid-column:1;writing-mode:vertical-rl;text-orientation:mixed;display:flex;align-items:center;justify-content:center;font-size:12.5px;letter-spacing:.15em;color:var(--accent);border-right:2px solid var(--accent);margin-right:4px}
 .node{position:relative;z-index:1;align-self:center;background:var(--paper);border:1.5px solid var(--ink);border-radius:7px;padding:7px 9px;font-size:13.5px;line-height:1.45;display:grid;gap:2px}
@@ -246,7 +249,7 @@ footer{border-top:1px solid var(--line);padding-top:20px;font-size:13px;color:va
     <div class="swim-legend">
       <span><i></i>系统内操作</span><span><i class="sys"></i>系统自动 / 系统状态</span><span><i class="off"></i>线下环节（推断）</span><span><i class="gate"></i>审批 / 判断点</span><span>虚线箭头：先后关系未确认</span>
     </div>
-    <div class="swim-scroll"><div class="swim" id="swim"></div></div>
+    <div><div class="swim-head" id="swimHead"><div class="swim-head-in" id="swimHeadIn"></div></div><div class="swim-scroll" id="swimScroll"><div class="swim" id="swim"></div></div></div>
     <p class="muted">设计、执行、核销三个部门合在「交付团队」一列；药企、专家、学会合在「外部方」一列，节点文字里写明是谁。第 12、13 步的两个节点同时进行。表格在窄屏上可以左右滑动。</p>
   </div>
 </section>
@@ -540,11 +543,13 @@ flowchart TB
   const E=[["1","2"],["2","3"],["3","4"],["4","5"],["5","6"],["6","7"],["7","8"],["8","9"],["9","10"],["10","11"],["11","12a"],["11","12b"],["12a","13a"],["12b","13b"],["13a","14"],["13b","14"],["14","15"],["15","16"],["16","17"],["17","18","dash"],["18","19"],["19","20"],["20","21"],["21","22"]];
   const phases=[["P01 商机到合同",1,9],["P02 合同到交付",10,14],["P03 交付到回款",15,22]];
   const g=document.getElementById('swim'); if(!g) return;
-  const R=r=>r+1; // 第 1 行是泳道头
-  g.style.gridTemplateRows='auto repeat(22,auto)';
+  const R=r=>r; // 泳道头在独立的吸顶条里
+  g.style.gridTemplateRows='repeat(22,auto)';
+  const hin=document.getElementById('swimHeadIn'), sc=document.getElementById('swimScroll');
+  const ph0=document.createElement('div');ph0.className='lane-h';ph0.style.gridColumn=1;ph0.innerHTML='阶段';hin.appendChild(ph0);
   lanes.forEach((l,i)=>{const b=document.createElement('div');b.className='lane-bg'+(i%2?' alt':'');b.style.gridColumn=i+2;g.appendChild(b);
-    const h=document.createElement('div');h.className='lane-h';h.style.gridColumn=i+2;h.innerHTML=l[1]+'<small>'+l[2]+'</small>';g.appendChild(h);});
-  const ph0=document.createElement('div');ph0.className='lane-h';ph0.style.gridColumn=1;ph0.innerHTML='阶段';g.appendChild(ph0);
+    const h=document.createElement('div');h.className='lane-h'+(i%2?' alt':'');h.style.gridColumn=i+2;h.innerHTML=l[1]+'<small>'+l[2]+'</small>';hin.appendChild(h);});
+  sc.addEventListener('scroll',()=>{hin.style.transform='translateX('+(-sc.scrollLeft)+'px)';},{passive:true});
   phases.forEach(p=>{const d=document.createElement('div');d.className='phase';d.style.gridRow=R(p[1])+'/'+(R(p[2])+1);d.textContent=p[0];g.appendChild(d);});
   const el={};
   N.forEach(n=>{const d=document.createElement('div');d.className='node'+(n[6]==='n'?'':' '+n[6]);d.style.gridColumn=L[n[1]];d.style.gridRow=R(n[2]);
@@ -554,6 +559,8 @@ flowchart TB
   const NS='http://www.w3.org/2000/svg';const svg=document.createElementNS(NS,'svg');g.appendChild(svg);
   svg.innerHTML='<defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z"/></marker></defs>';
   function draw(){
+    hin.style.width=g.offsetWidth+'px';
+    const tb=document.getElementById('tabs'); if(tb) document.documentElement.style.setProperty('--tabs-h',tb.offsetHeight+'px');
     [...svg.querySelectorAll('path.e')].forEach(p=>p.remove());
     const gr=g.getBoundingClientRect();
     E.forEach(e=>{const a=el[e[0]].getBoundingClientRect(),b=el[e[1]].getBoundingClientRect();
