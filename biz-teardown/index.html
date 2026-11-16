@@ -140,7 +140,7 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .ucg .bound{grid-column:2;grid-row:1/-1;margin:-40px -14px -12px -14px;border:2px solid var(--muted);border-radius:14px;z-index:0}
 .ucg .bound-t{position:absolute;top:14px;left:198px;right:26px;text-align:center;font-family:var(--f-display);font-size:15px;color:var(--muted)}
 .ucg .actor{grid-column:1;align-self:center}
-.ucg .ovrow{grid-column:2;display:flex;gap:16px;align-items:center;position:relative;z-index:1}
+.ucg .ovrow{grid-column:2;display:flex;flex-wrap:wrap;gap:12px 16px;align-items:center;position:relative;z-index:1}
 .ucg .ovrow .uc-o{flex:0 0 158px}
 .ucg .ovrow .none-note{font-size:13px;color:var(--muted)}
 .ph{display:inline-block;font-weight:500;font-size:10.5px;padding:0 6px;border-radius:999px;line-height:17px}
@@ -338,7 +338,7 @@ footer{border-top:1px solid var(--line);padding-top:20px;font-size:13px;color:va
   <div class="body">
     <ol class="jtbd">
       <li><p>当业务员给药企某条产品线报一个「N 场线上会」的价时，想当场算清每场的内部成本和利润，以便不报出亏本单。<span class="g gC">C 高</span></p><p class="src">报价单按场次展开、带净利和执行营收比率；7 张报价单里有 1 张被拒（E17）</p></li>
-      <li><p>当一笔钱从学会或基金会打进来时，财务想知道它该算在哪份合同上，以便合同回款对得上账。<span class="g gC">C 高</span></p><p class="src">到款付款方是学会，合同甲方是药企，系统为此设了「认款」（E19、E27）</p></li>
+      <li><p>当一笔钱从学会或基金会打进来时，业务员要把它认到自己的哪份合同上，以便合同回款对得上账。<span class="g gA">A</span></p><p class="src">到款付款方是学会，合同甲方是药企，系统为此设了「认款」（E19、E27）</p></li>
       <li><p>当一份合同要拆成 8 场会、每场都要设计、执行、核销三拨人接力时，项目经理想按场派活，以便不漏场。<span class="g gC">C 中</span></p><p class="src">8 场项目对应 8 条设计任务和 8 条执行任务，标题按日期命名（E21、E23、E24）</p></li>
       <li><p>当一场会涉及多位专家的劳务费时，公司想把劳务和会务费用单独结算，以便核销材料和费用对得上。<span class="g gC">C 中</span></p><p class="src">劳务结算、会务结算单列，成本项里有「核销资料整理（多专家）」（E17、E25、E26）</p></li>
     </ol>
@@ -476,17 +476,20 @@ flowchart TB
   subgraph R10[结算部]
     j1[F15 劳务结算]
     j2[F16 会务结算]
+    j3{结算部负责人审核}
+  end
+  subgraph R02[业务员]
+    k2[F17 导入银行流水]
+    k3[F18 单合同认款]
   end
   subgraph R07[财务]
     k1[F19 开票]
-    k2[F17 导入银行流水]
-    k3[F18 单合同认款]
     k4[F23 归档]
   end
   subgraph SYS[系统]
     t1[台账已回款更新]
   end
-  j1 --> j2 --> k1
+  j1 --> j2 --> j3 --> k1
   y1 --> w1 --> k2 --> k3 --> t1 --> k4
   k1 -. 发票交给谁 待验证 .-> w1
 </pre></div>
@@ -564,7 +567,8 @@ flowchart TB
         <tr><td class="n">V5</td><td>报价单「公司毛利」的口径（4 条样本反推不出一致公式）</td><td>问财务</td></tr>
         <tr><td class="n">V6</td><td>电子协议、医生信息、结算分配、红冲审批做没做</td><td>管理员账号截一份完整菜单</td></tr>
         <tr><td class="n">V7</td><td>场次任务、结算单、项目的状态取值</td><td>打开详情或筛选下拉框</td></tr>
-        <tr><td class="n">V8</td><td>结算部管到哪：结算单谁审；「学会到款记录」挂在结算菜单下，到款登记和认款是不是也归结算部（部门本身已确认：线下实有，系统里待补建）</td><td>问当事人，或用结算部账号看菜单</td></tr>
+        <tr><td class="n">V8</td><td>已确认：结算部线下实有、系统待建；结算单由结算部负责人审核；到款登记和认款由业务员做</td><td>当事人口述（E37–E39）</td></tr>
+        <tr><td class="n">V9</td><td>财务在系统里做什么：开票、借支打款、合同归档分别是谁</td><td>问当事人，或用财务账号看菜单</td></tr>
       </tbody>
     </table></div>
     <p class="muted">你参与过这个项目，V2、V3、V5、V6 大概率可以直接回答。答完以后，相关的 C 级推断能升到 A 级。</p>
@@ -604,11 +608,11 @@ flowchart TB
     ["13b","ext",13,"专家授课","","C","off"],
     ["14","team",14,"核销部：整理多专家核销资料","","C","gate","还有下一场 → 回到第 11 步"],
     ["15","settle",15,"劳务结算（专家劳务费）","F15","A","n"],
-    ["16","settle",16,"会务结算（劳务税前 + 其它费用）","F16","A","n"],
+    ["16","settle",16,"会务结算（劳务税前 + 其它费用）","F16","A","gate","两张结算单由结算部负责人审核"],
     ["17","fin",17,"开票","F19","A","n"],
     ["18","ext",18,"药企拨款给学会，学会付款给本公司","","C","off"],
-    ["19","fin",19,"导入银行流水，生成到款（待认款）","F17","A","n"],
-    ["20","fin",20,"单合同认款","F18","A","n"],
+    ["19","sales",19,"导入银行流水，生成到款（待认款）","F17","A","n"],
+    ["20","sales",20,"单合同认款","F18","A","n"],
     ["21","sys",21,"台账「已回款金额」更新","","C","sys"],
     ["22","fin",22,"合同归档","F23","C","n"]
   ];
@@ -659,8 +663,8 @@ flowchart TB
     ["UC06","design","P02","按时交付一场会的物料","C","收到设计任务",["做海报","做串场 PPT"],"未观察到","产出是否上传到系统，未观察到","12"],
     ["UC07","exec","P02","把一场直播办成","C","收到执行任务",["按会议时间开播","决定是否推流"],"未观察到","未观察到","13"],
     ["UC08","verify","P02","把核销材料交齐","C","会议已开（推断）",["整理多位专家的核销资料"],"核销任务页没打开过","未观察到","14"],
-    ["UC10","fin","P03","把到账的钱认到对应合同上","C","银行已到账",["导入银行流水","生成到款（待认款）","单合同认款","台账回款更新"],"一笔钱拆给多份合同是否支持：没看到","台账已回款金额增加（推断）","19–21"],
-    ["UC15","fin","P03","审核劳务和会务结算","C","结算单已提交",["审核劳务结算","审核会务结算"],"未观察到","结算通过","15–16"],
+    ["UC10","sales","P03","把到账的钱认到对应合同上","A","银行已到账",["导入银行流水","生成到款（待认款）","单合同认款","台账回款更新"],"一笔钱拆给多份合同是否支持：没看到","台账已回款金额增加（推断）","19–21"],
+    ["UC15","settle","P03","审核劳务和会务结算","A","结算单已提交",["结算部负责人审核劳务结算","审核会务结算"],"未观察到","结算通过","15–16"],
     ["UC12","all","GEN","为项目借支和报销","A","—",["发起借支或报销","关联合同","审批后打款"],"借支已打款后冲抵","已打款",""],
     ["UC13","admin","GEN","统一维护学会主数据","A","—",["新增学协会（基金会）","编辑或禁用"],"业务员不能随手录入","正常 / 禁用",""]
   ];
@@ -675,7 +679,7 @@ flowchart TB
     a.innerHTML=fig+'<span>'+r[1]+'<small>'+r[2]+'</small></span>';ucg.appendChild(a);actEl[r[0]]=a;
     const row=document.createElement('div');row.className='ovrow';row.style.gridRow=ri+1;ucg.appendChild(row);rowEl[r[0]]=row;
     const list=UC.filter(u=>u[1]===r[0]).sort((x,y)=>PO.indexOf(x[2])-PO.indexOf(y[2]));
-    if(!list.length){row.innerHTML='<span class="none-note">系统里没找到任何对应功能：可能线下完成，也可能本期没纳入 <span class="g gD">D</span></span>';return;}
+    if(!list.length){row.innerHTML='<span class="none-note">'+(r[0]==='fin'?'到款登记和认款经确认归业务员；财务在系统里具体做哪些事（开票？借支打款？合同归档？）还没确认 <span class="g gC">C</span>':'系统里没找到任何对应功能：可能线下完成，也可能本期没纳入 <span class="g gD">D</span>')+'</span>';return;}
     list.forEach(u=>{const o=document.createElement('button');o.type='button';o.className='uc-o g'+u[4];o.setAttribute('aria-pressed','false');
       o.innerHTML='<span class="id">'+u[0]+'</span>'+u[3]+'<span class="ph '+PHC[u[2]][0]+'">'+PHC[u[2]][1]+'</span>';
       o.addEventListener('click',()=>{pick(u[0]);ucd.scrollIntoView({block:'nearest',behavior:(matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth')});});
@@ -685,9 +689,14 @@ flowchart TB
     ln.querySelectorAll('path').forEach(x=>x.remove());
     const gr=ucg.getBoundingClientRect();
     RW.forEach(r=>{const os=[...rowEl[r[0]].querySelectorAll('.uc-o')]; if(!os.length) return;
-      const a=actEl[r[0]].querySelector('svg').getBoundingClientRect(), last=os[os.length-1].getBoundingClientRect();
-      const y=a.top+a.height/2-gr.top, x1=a.right-gr.left+6+ (actEl[r[0]].getBoundingClientRect().right-a.right), x2=last.left+last.width/2-gr.left;
-      const p=document.createElementNS('http://www.w3.org/2000/svg','path');p.setAttribute('d','M'+x1+','+y+' L'+x2+','+y);ln.appendChild(p);});
+      const a=actEl[r[0]].querySelector('svg').getBoundingClientRect();
+      const ya=a.top+a.height/2-gr.top, x1=a.right-gr.left+6+(actEl[r[0]].getBoundingClientRect().right-a.right);
+      // 椭圆可能折成多行：每一行一段横线，从角色出发经一根竖向主干接过去
+      const grp={};os.forEach(o=>{const b=o.getBoundingClientRect(),k=Math.round(b.top-gr.top);(grp[k]=grp[k]||[]).push(b);});
+      const ks=Object.keys(grp).map(Number).sort((m,n)=>m-n), xb=os[0].getBoundingClientRect().left-gr.left-12;
+      let d='';ks.forEach(k=>{const bs=grp[k],last=bs[bs.length-1],y=last.top+last.height/2-gr.top,x2=last.left+last.width/2-gr.left;
+        d+=(ks.length===1?'M'+x1+','+y:'M'+x1+','+ya+' L'+xb+','+ya+' L'+xb+','+y)+' L'+x2+','+y+' ';});
+      const p=document.createElementNS('http://www.w3.org/2000/svg','path');p.setAttribute('d',d);p.setAttribute('fill','none');ln.appendChild(p);});
   }
   window.__drawUcg=lines; lines();
   if(document.fonts&&document.fonts.ready) document.fonts.ready.then(lines);
