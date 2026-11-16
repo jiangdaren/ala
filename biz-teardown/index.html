@@ -134,6 +134,38 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .swim-legend i.off{border-style:dashed;border-color:var(--muted);background:var(--bg)}
 .swim-legend i.sys{border-color:var(--accent);background:var(--accent-soft)}
 .swim-legend i.gate{border-color:var(--gC);border-width:2px}
+/* 用例图（按角色成行） */
+.ucg-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:8px;background:var(--paper)}
+.ucg{position:relative;display:grid;grid-template-columns:150px 1fr;column-gap:34px;row-gap:10px;min-width:900px;padding:52px 26px 24px 14px}
+.ucg .bound{grid-column:2;grid-row:1/-1;margin:-40px -14px -12px -14px;border:2px solid var(--muted);border-radius:14px;z-index:0}
+.ucg .bound-t{position:absolute;top:14px;left:198px;right:26px;text-align:center;font-family:var(--f-display);font-size:15px;color:var(--muted)}
+.ucg .actor{grid-column:1;align-self:center}
+.ucg .ovrow{grid-column:2;display:flex;gap:16px;align-items:center;position:relative;z-index:1}
+.ucg .ovrow .uc-o{flex:0 0 158px}
+.ucg .ovrow .none-note{font-size:13px;color:var(--muted)}
+.ph{display:inline-block;font-weight:500;font-size:10.5px;padding:0 6px;border-radius:999px;line-height:17px}
+.ph1{color:var(--gB);background:var(--gB-bg)} .ph2{color:var(--gA);background:var(--gA-bg)} .ph3{color:var(--gC);background:var(--gC-bg)} .ph4{color:var(--muted);background:var(--bg);border:1px solid var(--line)}
+.uc-o .ph{margin-top:3px}
+/* 用例图：角色与椭圆的公共样式 */
+.actors{display:flex;flex-direction:column;justify-content:space-around;gap:6px;position:relative;z-index:2}
+.actor{display:grid;grid-template-columns:26px 1fr;align-items:center;gap:6px;font:inherit;font-size:13.5px;font-weight:500;color:var(--ink);background:none;border:none;text-align:left;padding:4px;border-radius:6px;cursor:default}
+.actor svg{width:26px;height:34px;stroke:var(--ink);stroke-width:1.6;fill:none}
+.actor small{display:block;font-weight:400;font-size:11.5px;color:var(--muted);line-height:1.3}
+.actor.none{opacity:.75}.actor.none svg{stroke-dasharray:3 2;stroke:var(--muted)}
+.uc-o{position:relative;font:inherit;font-size:13px;line-height:1.35;color:var(--ink);background:var(--paper);border:1.6px solid var(--ink);border-radius:50%;padding:12px 16px;min-height:62px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;cursor:pointer;transition:opacity .15s}
+.uc-o .id{font-family:var(--f-mono);font-size:10.5px;color:var(--muted)}
+.uc-o.gC{border-style:dashed}
+.uc-o:hover{border-color:var(--accent)}
+.uc-o[aria-pressed="true"]{background:var(--accent-soft);border-color:var(--accent);border-style:solid}
+.uc-o:focus-visible,.actor:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+#ucgLines{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:0;overflow:visible}
+#ucgLines path{fill:none;stroke:var(--muted);stroke-width:1.2;opacity:.75;transition:opacity .15s,stroke .15s}
+.ucg.focus .uc-o:not(.on),.ucg.focus .actor:not(.on){opacity:.28}
+.ucg.focus #ucgLines path{opacity:.08}
+.ucg.focus #ucgLines path.on{opacity:1;stroke:var(--accent);stroke-width:1.8}
+.ucg-key{display:flex;flex-wrap:wrap;gap:8px 18px;font-size:13px;color:var(--muted);align-items:center}
+.ucg-key i{display:inline-block;width:30px;height:16px;border-radius:50%;border:1.6px solid var(--ink);vertical-align:-3px;margin-right:6px}
+.ucg-key i.c{border-style:dashed}
 /* 角色用例矩阵 */
 .ucm-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:8px;background:var(--paper)}
 .ucm{display:grid;grid-template-columns:150px repeat(4,minmax(150px,1fr));min-width:780px}
@@ -288,9 +320,14 @@ footer{border-top:1px solid var(--line);padding-top:20px;font-size:13px;color:va
 </section>
 
 <section data-page="roles">
-  <div class="sec-head"><span class="sec-no">角色</span><h2>各角色用例</h2><p>每行一个角色，每列一个阶段。点任意用例，下方展开它的路径、异常和对应的流程步骤。角色是从组织架构、字段和 405 无权限页推出来的。</p></div>
+  <div class="sec-head"><span class="sec-no">角色</span><h2>各角色用例</h2><p>用例图：左边是角色，方框是系统边界，椭圆是用例。每个角色一行，顺着线读就是「他在系统里做哪些事」，椭圆上的小标签是所属阶段。点椭圆，下方展开用例说明。角色是从组织架构、字段和 405 无权限页推出来的。</p></div>
   <div class="body">
-    <div class="ucm-wrap"><div class="ucm" id="ucm"></div></div>
+    <div class="ucg-key"><span><i></i>实线椭圆：界面上看到了（A）</span><span><i class="c"></i>虚线椭圆：操作者或过程是推断（C）</span><span><b class="ph ph1">商机到合同</b> <b class="ph ph2">合同到交付</b> <b class="ph ph3">交付到回款</b> <b class="ph ph4">通用</b></span></div>
+    <div class="ucg-wrap"><div class="ucg" id="ucg">
+      <div class="bound" aria-hidden="true"></div>
+      <div class="bound-t">狸追OA · 系统边界</div>
+      <svg id="ucgLines" aria-hidden="true"></svg>
+    </div></div>
     <div class="ucd" id="ucd" aria-live="polite"></div>
     <p class="muted">你参与过调研，各角色实际是谁在做哪件事，你一句话就能把这里的 C 级改成 A 级。</p>
   </div>
@@ -626,20 +663,34 @@ flowchart TB
     ["UC12","all","GEN","为项目借支和报销","A","—",["发起借支或报销","关联合同","审批后打款"],"借支已打款后冲抵","已打款",""],
     ["UC13","admin","GEN","统一维护学会主数据","A","—",["新增学协会（基金会）","编辑或禁用"],"业务员不能随手录入","正常 / 禁用",""]
   ];
-  const ucm=document.getElementById('ucm'), ucd=document.getElementById('ucd');
-  const chips={};
-  const cell=(html,cls)=>{const d=document.createElement('div');d.className=cls||'';d.innerHTML=html||'';ucm.appendChild(d);return d;};
-  cell('<b>角色</b>','hd c0'); PH.forEach(p=>cell('<b>'+p[1]+'</b>'+(p[0]==='GEN'?'':p[0]),'hd'));
-  RW.forEach((r,ri)=>{const last=ri===RW.length-1?' last':'';
-    cell('<b>'+r[1]+'</b><span>'+r[2]+'</span>','rl c0'+last);
-    PH.forEach(p=>{const d=cell('',last.trim());
-      const list=UC.filter(u=>u[1]===r[0]&&u[2]===p[0]);
-      if(r[0]==='comp'&&p[0]==='P01'){d.innerHTML='<span class="note">系统里没找到任何对应功能。可能线下完成，也可能本期没纳入 <span class="g gD">D</span></span>';return;}
-      if(!list.length){d.innerHTML='<span class="empty">—</span>';return;}
-      list.forEach(u=>{const b=document.createElement('button');b.type='button';b.className='uc-chip g'+u[4];b.setAttribute('aria-pressed','false');
-        b.innerHTML='<span class="id">'+u[0]+' · '+u[4]+'</span>'+u[3];b.addEventListener('click',()=>{pick(u[0]);ucd.scrollIntoView({block:'nearest',behavior:(matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth')});});d.appendChild(b);chips[u[0]]=b;});
-    });
+  const ucd=document.getElementById('ucd'), ucg=document.getElementById('ucg'), ln=document.getElementById('ucgLines');
+  const chips={}, actEl={}, rowEl={};
+  const fig='<svg viewBox="0 0 26 34"><circle cx="13" cy="6" r="4.5"/><path d="M13 10.5v11M4 15h18M13 21.5l-7 10M13 21.5l7 10"/></svg>';
+  const PHC={P01:['ph1','商机到合同'],P02:['ph2','合同到交付'],P03:['ph3','交付到回款'],GEN:['ph4','通用']};
+  const PO=['P01','P02','P03','GEN'];
+  ucg.style.gridTemplateRows='repeat('+RW.length+',minmax(78px,auto))';
+  RW.forEach((r,ri)=>{
+    const a=document.createElement('div');a.className='actor'+(r[0]==='comp'?' none':'');a.style.gridRow=ri+1;
+    a.innerHTML=fig+'<span>'+r[1]+'<small>'+r[2]+'</small></span>';ucg.appendChild(a);actEl[r[0]]=a;
+    const row=document.createElement('div');row.className='ovrow';row.style.gridRow=ri+1;ucg.appendChild(row);rowEl[r[0]]=row;
+    const list=UC.filter(u=>u[1]===r[0]).sort((x,y)=>PO.indexOf(x[2])-PO.indexOf(y[2]));
+    if(!list.length){row.innerHTML='<span class="none-note">系统里没找到任何对应功能：可能线下完成，也可能本期没纳入 <span class="g gD">D</span></span>';return;}
+    list.forEach(u=>{const o=document.createElement('button');o.type='button';o.className='uc-o g'+u[4];o.setAttribute('aria-pressed','false');
+      o.innerHTML='<span class="id">'+u[0]+'</span>'+u[3]+'<span class="ph '+PHC[u[2]][0]+'">'+PHC[u[2]][1]+'</span>';
+      o.addEventListener('click',()=>{pick(u[0]);ucd.scrollIntoView({block:'nearest',behavior:(matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth')});});
+      row.appendChild(o);chips[u[0]]=o;});
   });
+  function lines(){
+    ln.querySelectorAll('path').forEach(x=>x.remove());
+    const gr=ucg.getBoundingClientRect();
+    RW.forEach(r=>{const os=[...rowEl[r[0]].querySelectorAll('.uc-o')]; if(!os.length) return;
+      const a=actEl[r[0]].querySelector('svg').getBoundingClientRect(), last=os[os.length-1].getBoundingClientRect();
+      const y=a.top+a.height/2-gr.top, x1=a.right-gr.left+6+ (actEl[r[0]].getBoundingClientRect().right-a.right), x2=last.left+last.width/2-gr.left;
+      const p=document.createElementNS('http://www.w3.org/2000/svg','path');p.setAttribute('d','M'+x1+','+y+' L'+x2+','+y);ln.appendChild(p);});
+  }
+  window.__drawUcg=lines; lines();
+  if(document.fonts&&document.fonts.ready) document.fonts.ready.then(lines);
+  if('ResizeObserver' in window) new ResizeObserver(lines).observe(ucg);
   function pick(id){const u=UC.find(x=>x[0]===id); if(!u) return;
     Object.entries(chips).forEach(([k,b])=>b.setAttribute('aria-pressed',k===id?'true':'false'));
     const role=RW.find(r=>r[0]===u[1]), ph=PH.find(p=>p[0]===u[2]);
@@ -668,6 +719,7 @@ flowchart TB
     if(last) last.after(pager);
     if(footer) footer.hidden = name!=='verify';
     if(name==='panorama'&&window.__drawSwim) requestAnimationFrame(window.__drawSwim);
+    if(name==='roles'&&window.__drawUcg) requestAnimationFrame(window.__drawUcg);
     const cur=tabs.find(t=>t.dataset.to===name); if(cur&&cur.scrollIntoView) cur.scrollIntoView({block:'nearest',inline:'nearest'});
     if(scroll) window.scrollTo({top:0});
   }
