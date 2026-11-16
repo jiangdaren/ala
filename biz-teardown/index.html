@@ -109,11 +109,11 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .brief .todo{color:var(--gC);background:var(--gC-bg);border-radius:4px;padding:0 5px;font-size:.92em}
 /* 全景泳道 */
 .swim-scroll{overflow-x:auto;border:1px solid var(--line);border-top:none;border-radius:0 0 8px 8px;background:var(--paper)}
-.swim{position:relative;display:grid;grid-template-columns:40px repeat(7,minmax(100px,1fr));row-gap:22px;column-gap:8px;min-width:830px;padding:18px 10px 22px 0}
+.swim{position:relative;display:grid;grid-template-columns:40px repeat(8,minmax(100px,1fr));row-gap:22px;column-gap:8px;min-width:940px;padding:18px 10px 22px 0}
 .lane-bg{grid-row:1/-1;margin:-18px -5px 0;border-radius:0 0 6px 6px}
 .lane-bg.alt{background:var(--bg)}
 .swim-head{position:sticky;top:calc(env(safe-area-inset-top,0px) + var(--tabs-h,48px));z-index:4;overflow:hidden;background:var(--paper);border:1px solid var(--line);border-radius:8px 8px 0 0;box-shadow:0 6px 10px -8px rgba(0,0,0,.35)}
-.swim-head-in{display:grid;grid-template-columns:40px repeat(7,minmax(100px,1fr));column-gap:8px;min-width:830px;padding:0 10px 0 0;will-change:transform}
+.swim-head-in{display:grid;grid-template-columns:40px repeat(8,minmax(100px,1fr));column-gap:8px;min-width:940px;padding:0 10px 0 0;will-change:transform}
 .lane-h{padding:12px 4px 10px;text-align:center;font-size:13px;font-weight:700;margin:0 -5px}
 .lane-h.alt{background:var(--bg)}
 .lane-h small{display:block;font-weight:400;font-size:11.5px;color:var(--muted)}
@@ -473,7 +473,7 @@ flowchart TB
   subgraph X2[学会/基金会]
     w1[向本公司付款]:::offline
   end
-  subgraph R03[项目经理]
+  subgraph R10[结算部]
     j1[F15 劳务结算]
     j2[F16 会务结算]
   end
@@ -564,6 +564,7 @@ flowchart TB
         <tr><td class="n">V5</td><td>报价单「公司毛利」的口径（4 条样本反推不出一致公式）</td><td>问财务</td></tr>
         <tr><td class="n">V6</td><td>电子协议、医生信息、结算分配、红冲审批做没做</td><td>管理员账号截一份完整菜单</td></tr>
         <tr><td class="n">V7</td><td>场次任务、结算单、项目的状态取值</td><td>打开详情或筛选下拉框</td></tr>
+        <tr><td class="n">V8</td><td>结算部管到哪：结算单谁审；「学会到款记录」挂在结算菜单下，到款登记和认款是不是也归结算部；为什么部门架构里没有结算部</td><td>问当事人，或用结算部账号看菜单</td></tr>
       </tbody>
     </table></div>
     <p class="muted">你参与过这个项目，V2、V3、V5、V6 大概率可以直接回答。答完以后，相关的 C 级推断能升到 A 级。</p>
@@ -582,7 +583,7 @@ flowchart TB
 
 <script>
 (function(){
-  const lanes=[["ext","外部方","药企 · 专家 · 学会"],["sales","业务员","销售部"],["mgmt","管理层","董事会"],["pm","项目经理","项目部"],["team","交付团队","设计 · 执行 · 核销"],["fin","财务","会计 · 出纳"],["sys","系统","自动生成 / 状态"]];
+  const lanes=[["ext","外部方","药企 · 专家 · 学会"],["sales","业务员","销售部"],["mgmt","管理层","董事会"],["pm","项目经理","项目部"],["team","交付团队","设计 · 执行 · 核销"],["settle","结算部","劳务 · 会务结算"],["fin","财务","会计 · 出纳"],["sys","系统","自动生成 / 状态"]];
   const L=Object.fromEntries(lanes.map((l,i)=>[l[0],i+2]));
   // id, lane, row, 文本, F编号, 等级, 类型(n/off/sys/gate), 分支说明
   const N=[
@@ -602,8 +603,8 @@ flowchart TB
     ["13a","team",13,"执行部：19:00 直播推流","","C","off"],
     ["13b","ext",13,"专家授课","","C","off"],
     ["14","team",14,"核销部：整理多专家核销资料","","C","gate","还有下一场 → 回到第 11 步"],
-    ["15","pm",15,"劳务结算（专家劳务费）","F15","A","n"],
-    ["16","pm",16,"会务结算（劳务税前 + 其它费用）","F16","A","n"],
+    ["15","settle",15,"劳务结算（专家劳务费）","F15","A","n"],
+    ["16","settle",16,"会务结算（劳务税前 + 其它费用）","F16","A","n"],
     ["17","fin",17,"开票","F19","A","n"],
     ["18","ext",18,"药企拨款给学会，学会付款给本公司","","C","off"],
     ["19","fin",19,"导入银行流水，生成到款（待认款）","F17","A","n"],
@@ -644,7 +645,7 @@ flowchart TB
   if(document.fonts&&document.fonts.ready) document.fonts.ready.then(draw);
   if('ResizeObserver' in window) new ResizeObserver(draw).observe(g); else window.addEventListener('resize',draw);
 
-  const RW=[["sales","业务员","销售部（部分挂董事会）· C 中"],["mgmt","管理层","董事会 · C 高"],["pm","项目经理","项目部 · 项目一 / 二组 · C 中"],["design","设计部","项目部 · C 中"],["exec","执行部","项目部 · C 中"],["verify","核销部","项目部 · 核销一 / 二 / 三组 · C 中"],["fin","财务","财务部 · 会计 / 出纳 · C 中"],["all","全员","任意员工"],["admin","系统管理员","超级员工 · C 高"],["comp","合规部","合规人员"]];
+  const RW=[["sales","业务员","销售部（部分挂董事会）· C 中"],["mgmt","管理层","董事会 · C 高"],["pm","项目经理","项目部 · 项目一 / 二组 · C 中"],["design","设计部","项目部 · C 中"],["exec","执行部","项目部 · C 中"],["verify","核销部","项目部 · 核销一 / 二 / 三组 · C 中"],["settle","结算部","专设部门 · 当事人口述 A"],["fin","财务","财务部 · 会计 / 出纳 · C 中"],["all","全员","任意员工"],["admin","系统管理员","超级员工 · C 高"],["comp","合规部","合规人员"]];
   const PH=[["P01","商机到合同"],["P02","合同到交付"],["P03","交付到回款"],["GEN","通用"]];
   const UC=[
     ["UC01","sales","P01","把新客户登记在自己名下","A","—",["报备客户（药企 × 产品线）","董事会或签审批"],"审批后再改要重新审批；可共享给同事","客户审批通过、归属本人","2–3"],
@@ -654,7 +655,7 @@ flowchart TB
     ["UC03","mgmt","P01","守住利润底线","A","报价单审核中",["看成本明细、净利、执行营收比率","会签通过或拒绝"],"拒绝 → 退回业务员修改","审核通过 / 不通过","5"],
     ["UC14","mgmt","P01","把关客户和合同","A","客户或合同已提交",["客户或签审批","合同审批"],"能看全部模块，但不能立项、不能登记到款（两次 405）","客户 / 合同审批通过","3、9"],
     ["UC05","pm","P02","把合同拆成每场会的活","C","合同审核通过（推断）",["立项（项目名含场数）","每场派设计任务","派执行任务","派核销任务"],"未观察到","项目进行中，N 场 × 3 类任务","10–11"],
-    ["UC09","pm","P03","算清专家劳务和会务费用","C","会议已开",["劳务结算","会务结算（劳务税前 + 其它费用）"],"未观察到","结算单进入审核","15–16"],
+    ["UC09","settle","P03","算清专家劳务和会务费用","A","会议已开",["劳务结算","会务结算（劳务税前 + 其它费用）"],"未观察到","结算单进入审核","15–16"],
     ["UC06","design","P02","按时交付一场会的物料","C","收到设计任务",["做海报","做串场 PPT"],"未观察到","产出是否上传到系统，未观察到","12"],
     ["UC07","exec","P02","把一场直播办成","C","收到执行任务",["按会议时间开播","决定是否推流"],"未观察到","未观察到","13"],
     ["UC08","verify","P02","把核销材料交齐","C","会议已开（推断）",["整理多位专家的核销资料"],"核销任务页没打开过","未观察到","14"],
